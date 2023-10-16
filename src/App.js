@@ -14,6 +14,7 @@ function App() {
     state[attribute] = 10;
     return state;
   }, {});
+  const [selectedClass, setSelectedClass] = useState(null);
 
   const [attributes, setAttributes] = useState(initialAttributesState);
 
@@ -38,6 +39,10 @@ function App() {
     return ATTRIBUTE_LIST.every(
       (attribute) => attributes[attribute] >= classRequirements[attribute]
     );
+  };
+
+  const displayClassRequirements = (className) => {
+    setSelectedClass(className);
   };
 
   return (
@@ -68,11 +73,27 @@ function App() {
                 style={{
                   color: isClassRequirementsMet(className) && "green",
                 }}
+                onClick={() => displayClassRequirements(className)}
               >
                 {className}
               </li>
             ))}
           </ul>
+
+          {selectedClass && (
+            <div>
+              <h3>{selectedClass} Requirements</h3>
+              <ul style={{ listStyleType: "none", padding: 0 }}>
+                {Object.keys(CLASS_LIST[selectedClass]).map((attribute, i) => (
+                  <li key={attribute}>
+                    <span>
+                      {attribute}: {CLASS_LIST[selectedClass][attribute]}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
     </div>
