@@ -45,6 +45,11 @@ function App() {
     setSelectedClass(className);
   };
 
+  const calculateModifier = (value) => {
+    const modifier = Math.floor((value - 10) / 2);
+    return modifier;
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -60,6 +65,9 @@ function App() {
                 <button onClick={() => decrementAttribute(attribute)}>-</button>
                 <span>{attributes[attribute]}</span>
                 <button onClick={() => incrementAttribute(attribute)}>+</button>
+                <span>{`${attribute} Modifier: ${calculateModifier(
+                  attributes[attribute]
+                )}`}</span>
               </li>
             ))}
           </ul>
@@ -94,6 +102,10 @@ function App() {
               </ul>
             </div>
           )}
+        </div>
+
+        <div style={CONTAINER_STYLE}>
+          <h2>Skill</h2>
         </div>
       </section>
     </div>
