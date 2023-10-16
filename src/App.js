@@ -11,7 +11,7 @@ const CONTAINER_STYLE = {
 
 function App() {
   const initialAttributesState = ATTRIBUTE_LIST.reduce((state, attribute) => {
-    state[attribute] = 10;
+    state[attribute] = 0;
     return state;
   }, {});
 
@@ -23,11 +23,27 @@ function App() {
     return initialState;
   };
 
+  const calculateSkillPointsTotal = (newIntelligence = -1) => {
+    if (newIntelligence >= 0) {
+      return 10 + newIntelligence * 4;
+    }
+    return 10 + attributes["Intelligence"] * 4;
+  };
+
   const [selectedClass, setSelectedClass] = useState(null);
   const [attributes, setAttributes] = useState(initialAttributesState);
   const [skills, setSkills] = useState(initialSkillsState);
 
+  const [skillPointsUsed, setSkillPointsUsed] = useState(0);
+  const [skillPointsTotal, setSkillPointsTotal] = useState(
+    calculateSkillPointsTotal()
+  );
+
   const incrementAttribute = (attribute) => {
+    if (attribute === "Intelligence") {
+      setSkillPointsTotal(calculateSkillPointsTotal(attributes[attribute] + 1));
+    }
+
     setAttributes((prevAttributes) => ({
       ...prevAttributes,
       [attribute]: prevAttributes[attribute] + 1,
@@ -35,7 +51,15 @@ function App() {
   };
 
   const decrementAttribute = (attribute) => {
-    if (attributes[attribute] > 0) {
+    const skillsPointsAvailable = skillPointsTotal - skillPointsUsed;
+
+    if (attributes[attribute] > 0 && skillsPointsAvailable >= 4) {
+      if (attribute === "Intelligence") {
+        setSkillPointsTotal(
+          calculateSkillPointsTotal(attributes[attribute] - 1)
+        );
+      }
+
       setAttributes((prevAttributes) => ({
         ...prevAttributes,
         [attribute]: prevAttributes[attribute] - 1,
@@ -44,17 +68,24 @@ function App() {
   };
 
   const incrementSkill = (skill) => {
-    setSkills((prevSkills) => ({
-      ...prevSkills,
-      [skill]: prevSkills[skill] + 1,
-    }));
+    if (skillPointsUsed < skillPointsTotal) {
+      setSkillPointsUsed((prevValue) => prevValue + 1);
+      setSkills((prevSkills) => ({
+        ...prevSkills,
+        [skill]: prevSkills[skill] + 1,
+      }));
+    }
   };
 
   const decrementSkill = (skill) => {
-    setSkills((prevSkills) => ({
-      ...prevSkills,
-      [skill]: prevSkills[skill] - 1,
-    }));
+    if (skills[skill] > 0) {
+      setSkillPointsUsed((prevValue) => prevValue - 1);
+
+      setSkills((prevSkills) => ({
+        ...prevSkills,
+        [skill]: prevSkills[skill] - 1,
+      }));
+    }
   };
 
   const isClassRequirementsMet = (className) => {
@@ -129,7 +160,12 @@ function App() {
 
         <div style={CONTAINER_STYLE}>
           <h2>Skills</h2>
-          <h3>Skill points available: </h3>
+          <h3>
+            {"Skill points used: "}
+            {skillPointsUsed}
+            {"/"}
+            {skillPointsTotal}
+          </h3>
           <table>
             <thead>
               <tr>
