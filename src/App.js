@@ -14,9 +14,18 @@ function App() {
     state[attribute] = 10;
     return state;
   }, {});
-  const [selectedClass, setSelectedClass] = useState(null);
 
+  const initialSkillsState = () => {
+    const initialState = {};
+    SKILL_LIST.forEach((skill) => {
+      initialState[skill.name] = 0;
+    });
+    return initialState;
+  };
+
+  const [selectedClass, setSelectedClass] = useState(null);
   const [attributes, setAttributes] = useState(initialAttributesState);
+  const [skills, setSkills] = useState(initialSkillsState);
 
   const incrementAttribute = (attribute) => {
     setAttributes((prevAttributes) => ({
@@ -32,6 +41,20 @@ function App() {
         [attribute]: prevAttributes[attribute] - 1,
       }));
     }
+  };
+
+  const incrementSkill = (skill) => {
+    setSkills((prevSkills) => ({
+      ...prevSkills,
+      [skill]: prevSkills[skill] + 1,
+    }));
+  };
+
+  const decrementSkill = (skill) => {
+    setSkills((prevSkills) => ({
+      ...prevSkills,
+      [skill]: prevSkills[skill] - 1,
+    }));
   };
 
   const isClassRequirementsMet = (className) => {
@@ -105,7 +128,45 @@ function App() {
         </div>
 
         <div style={CONTAINER_STYLE}>
-          <h2>Skill</h2>
+          <h2>Skills</h2>
+          <h3>Skill points available: </h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Skill Name</th>
+                <th>Added </th>
+                <th>Modifier </th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SKILL_LIST.map(function (skill) {
+                return (
+                  <tr key={skill.name}>
+                    <td>{skill.name}</td>
+                    <td>
+                      <button onClick={() => decrementSkill(skill.name)}>
+                        -
+                      </button>
+                      {skills[skill.name]}
+                      <button onClick={() => incrementSkill(skill.name)}>
+                        +
+                      </button>
+                    </td>
+                    <td>
+                      {skill.attributeModifier}
+                      {": "}
+                      {calculateModifier(attributes[skill.attributeModifier])}
+                    </td>
+                    <td>
+                      {skills[skill.name] +
+                        calculateModifier(attributes[skill.attributeModifier])}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
